@@ -1,0 +1,1095 @@
+SPRINT 1
+	layout do projeto, baseado no bootstrap
+	- pagina inicial
+	- contato
+	- pagina de listar produtos
+	- pagina de um produto específico
+
+# documentação do django
+https://docs.djangoproject.com/en/1.10/
+
+# template do bootstrap usado neste projeto
+http://bootswatch.com/flatly/
+
+# reporitório de pacotes django
+https://djangopackages.org/
+
+# github do djangoproject
+https://github.com/django/django
+
+# site do pypi
+https://pypi.python.org/pypi
+
+# adicionar reporitório do python3.5
+sudo add-apt-repository ppa:fkrull/deadsnakes
+
+# como instalar virtualenv no python3.5
+sudo apt-get install python-virtualenv
+
+# criando o ambiente virtual
+# venv é o nome da pasta que vai criar
+# -p é a versão do python que vai ser instalado no ambiente virtual
+virtualenv venv -p python3.5
+
+# ativando o ambiente virtual, com python3.5 por padrão
+source venv/bin/activate
+
+# instalando django 1.9 no ambiente virtual
+pip install django==1.9
+	Successfully installed django-1.9
+	(venv)
+
+# upgrading django to version 1.9.5
+pip install -U django==1.9.5
+
+# criando o projeto djangoecommerce no diretório atual
+django-admin startproject djangoecommerce .
+
+# arquivo base do meu projeto
+# é nele que vou rodar todos os comandos django:
+	# rodar o servidor
+	# atualizar o banco de dados...etc
+manage.py
+# levantando o servidor
+./manage.py runserver
+./manage.py runserver 0.0.0.0:8000 # se eu tiver usando uma VM
+
+====================================================
+====================================================
+# Aula 6 - primeira app django
+
+# PRIMEIRAS CONFIGURAÇÕES
+settings.py
+# arquivo com as configuraões gerais do django
+	banco de dados, configuraões de envio de e-mail, arquivos estáticos, templates.......etc
+
+
+# BASE_DIR armazena o diretório raiz do projeto
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+	# caminho absoluto do arquivo
+	os.path.abspath(__file__)
+
+	# diretório onde está o settings
+	os.path.dirname()
+
+# altera locale de:
+# posso ter mais de um idioma no projeto, com locale
+LANGUAGE_CODE = 'pt-br'
+
+# altera o timezone para:
+TIME_ZONE = 'America/Sao_Paulo'
+
+# CRIANDO MINHA PRIMEIRA APP DJANGO
+./manage.py startapp core
+	# startapp cria uma aplicação e cria os requisitos mínimos para essa aplicação
+	# na app core é onde se coloca as coisas básicas que serão usadas pelas outras apps do meu projeto
+
+# DIZENDO AO DJANGO QUE EXISTE A APP core NO MEU SISTEMA
+# em settings.py
+INSTALLED_APPS = [
+	'core',
+]
+
+# altera o arquivo core/views.py
+	# insere as linhas:
+# coding=utf-8
+
+# sempre que eu precisar criar uma url, eu tenho que ter uma view associada à ela
+
+# o django consiste em mapeamento (com regex) de urls em funções, que são as views
+
+# edita urls.py - ´e uma lista de urls - sao todas as urls do meu sistema
+urlpatterns = [
+    url(r'^$'), # r indica ao python que é uma string regex '^$' indica que é a url mãe
+    
+    # 1º parametro ´e a regex
+    # 2º parametro ´e a url
+    url(r'^admin/', admin.site.urls),
+]
+
+# toda view no django ´e uma funçao que deve retornar o objeto HttpResponse:
+exemplo:
+def index(request):
+	pass
+recebe um request que ´e um HttpRequest e retorna um HttpResponse
+
+acabei de fazer meu primeiro hello world na minha primeira aplicaçao que ´e a aplicaçao core
+	criei minha primeira url
+	criei minha primeira view
+- url ´e um padrao regex que vai casar com uma view
+- essa view ´e uma funçao python que recebe um objeto request como parametro e deve retornar um objeto response com o objeto HttpResponse
+
+
+======================================fim======================================
+======================================inicio======================================
+AULA 7 - Sistema de templates(Template tags, Variáveis e filtros)
+settings.py
+	TEMPLATES = [
+		'DIRS': [], # é uma lista de diretórios onde eu vou encontrar os meus templates
+					- templates pode ser uma página html, txt, qualquer arquivo de texto com marcação
+
+		'APP_DIRS': True, # vou procurar templates dentro de uma pasta chamada templates que está dentro de cada aplicação
+
+# crio a pasta templates dentro de core
+$ mkdir core/templates
+# estou dizendo ao django para procurar templates dentro de core/templates
+
+# crio index.html
+$ touch core/templates/index.html
+
+# marcação especial django templates
+variáveis
+{{ title }} # vai carregar o valor de title, que vem de um context
+- context  é um dicionário com chave e valor, declarado na view
+
+- tem também marcação especial de templates tags
+- templates tags vão alterar o fluxo da minha página
+ex: eu tenho uma lista de produtos, faço um for para iterar sobre esta lista de produtos
+
+- filtros, servem para formatar a minha saída
+
+
+====================================================
+====================================================
+AULA 8 - trabalhando com arquivos estáticos
+settings.py
+INSTALLED_APPS = [
+	# como o django serve arquivos estáticos:
+	- o django procura uma pasta chamada static dentro de cada app
+	'django.contrib.staticfiles',
+]
+
+settings.py
+# o caminho d arquivo estático
+STATIC_URL = '/static/'
+====================================================
+# pode-se criar também uma pasta de arquivos estáticos  global para o projeto:
+settings.py
+STATICFILES_DIRS = [  # que é uma lista de diretórios alternativos
+	os.path.join(BASE_DIR, 'staticfiles') # staticfiles é a pasta global na raiz do projeto
+]
+
+O django só serve arquivo estático se:
+- 'django.contrib.staticfiles', # tiver ativa
+- ./manage.py runserver         # rodar o projeto com o runserver
+- DEBUG = True                  # estar em modo debug
+====================================================
+- Para carregar os arquivos estáticos automaticamente:
+- insere a linha {% load static %} em:
+ /core/templates/base.html e as llinhas com a templatetag {% static "" %}:
+ 	<link rel="stylesheet" href="{% static 'assets/bootstrap.min.css' %}" media="screen" />
+	<link rel="stylesheet" href="{% static 'assets/custom.min.css' %}" media="screen" />
+	<script src="{% static 'assets/bootstrap.min.js' %}"></script>
+
+
+
+====================================================
+# indicando a url dos arquivos estáticos, carregando os arquivos estáticos
+<!DOCTYPE html>
+{% load static %}
+<link rel="stylesheet" href="{% static 'assets/bootstrap.min.css' %}" media="screen" />
+<link rel="stylesheet" href="{% static 'assets/custom.min.css' %}" media="screen" />
+<script src="{% static 'assets/bootstrap.min.js' %}"></script>
+====================================================
+====================================================
+AULA 9 - Criando templates com herança e include
+- entregas do primeiro sprint
+	- página inicial
+	- página de listagem de produtos, pode ser uma categoria ou uma busca
+	- página de um produto
+	- página de contato
+
+- Todas as páginas tem coisas em comum:
+	- cabeçalho igual
+	- footer igual
+Só muda o conteúdo principal
+====================================================
+Herança de templates
+	- crio um template base  "/core/templates/base.html" que será a base do meu sistema de templates
+	
+	- depois vou criar meus templates auxiliares que vão ser renderizados de fato
+	- esses templates vão herdar do template base
+	
+- copio todo o conteúdo de "/core/templates/index.html" para:
+	- /core/templates/base.html
+- removo o miolo do "/core/templates/base.html"
+====================================================
+abro "/core/templates/index.html"
+- apago todo o conteúdo do arquivo
+
+- insiro esta linha no arquivo /core/templates/index.html
+{% extends "base.html" %}
+- estou indicando que ele deve herdar do template "/core/templates/base.html" e ele deve preencher somente os blocos que o base.html definiu
+
+- os blocos são nesse formato:
+	{% block blockname %}
+		
+	{% endblock blockname %}
+====================================================
+- no arquivo "/core/templates/base.html"
+<title>{% block title %}Django E-Commerce{% endblock %}</title>
+{% block container %}{% endblock %}
+aqui é um possível local  onde eu posso criar html nos filhos
+
+====================================================
+- em "/core/templates/index.html" que herda de "/core/templates/base.html" eu faço:
+{% block container %}
+	<div class="jumbotron page-header">
+		aqui vai o conteúdo da div
+	</div>
+{% endblock %}
+====================================================
+- herança de templates é uma via de duas mãos
+	exemplo:
+	Primeiro passo:
+		- "/core/templates/index.html" herda tudo de "/core/templates/base.html"
+	Segundo passo:
+		- Concatena o conteúdo de "/core/templates/base.html" com "/core/templates/index.html"
+	Terceiro passo:
+		- Devolve o conteúdo dos dois arquivos concatenados para "/core/templates/base.html"
+	Quarto passo:
+		- Exibe o novo conteúdo de "/core/templates/base.html"
+
+Esse processo é o mesmo para todos os templates
+
+====================================================
+"/core/views.py"
+insiro as funções index e contact:
+def index(request):
+	return render(request, 'index.html')
+
+def contact(request):
+	return render(request, 'contact.html')
+====================================================
+- Já tenho as minhas views index e contact
+
+- falta definir as minhas urls
+"/djangoecommerce/urls.py"
+- agora eu tenho as minhas quatro urls com as minhas quatro views:
+	- index, contato, produto e produtos
+
+- é boa prática sempre nomear as urls para poder chamar as urls depois em qualquer lugar do projeto
+
+- segue exemplo e nomes e uso dos nomes:
+em urls.py
+urlpatterns = [
+    url(r'^$', views.index, name='index'),
+    url(r'^contato/$', views.contact, name='contact'),
+    url(r'^produto/$', views.product, name='product'),
+    url(r'^produtos/$', views.product_list, name='product_list'),
+    url(r'^admin/', admin.site.urls),
+]
+- quando eu nomeio as urls eu dou um nome único dentro do sistema para que eu possa referenciar qualquer uma delas em qualquer lugar do meu sistema sem a necessidade de saber exatamente como é essa url 
+- exemplo:
+	url(r'^contato/$', views.contact, name='contact'),
+	- tenho a url "contato" e dei o nome "contact" pra ela 
+	- dentro dos meus templates eu chamo ela através de "contact", eu posso alterar  a url e não vou ter 
+	problema
+
+	- posso alterar por exemplo para:
+		url(r'^fale-conosco/$', views.contact, name='contact'),
+====================================================
+"/core/templates/base.html"
+- altero de:
+	<a href="#">Início</a>
+		para:
+	<a href="{% url 'index' %}">Início</a>
+	- a template tag "url" pede um nome de url
+	- eu informo a url 'index' e ele vai gerar a url com esse nome
+- acessando 
+====================================================
+
+
+em base.html
+<a href="{% url 'contact' %}">Contato</a>
+====================================================
+====================================================
+AULA 10 - adicionando os primeiros unitários testes
+- apago o arquivos "tests.py"
+
+- crio uma pasta "tests" para cada app do sistema
+	- /core/tests
+crio os arquivos:
+	- /core/tests/__init__.py
+	- /core/tests/test_views.py
+
+from django.test import TestCase, Client
+TestCase é a classe que representa um teste unitário
+Client simula o navegador nos testes
+
+"/core/test_views.py"
+
+====================================================
+- vou criar sempre classes que herdam de TestCase
+class IndexViewTestCase(TestCase):
+	pass
+
+====================================================
+
+Teste classe IndexViewTestCase que herda de TestCase
+- no miolo da classe eu escrevo os métodos dessa classe que vão representar um teste específico
+
+"/core/test_views.py"
+- quero saber se a view index está retornando o código HTTP 200
+class IndexViewTestCase(TestCase):
+	def test_status_code(self):
+		"a função está complleta no arquivo /core/test_views.py"
+====================================================
+"/core/test_views.py"
+from django.core.urlresolvers import reverse
+
+- o reverse vai indicar a url através de um nome
+		self.url = reverse('index')
+
+
+====================================================
+AULA 11 - Deply do sistema no Heroku
+- no terminal na miha máquina
+$ heroku login
+Logged in as josuerodrigues@gmail.com
+
+criando chave ssh
+$ ssh-keygen -t rsa -C "josuerodrigues@gmail.com"
+
+verificando minha chave ssh public 
+$ cat ~/.ssh/id_rsa.pub
+
+adicionando minha chave ~/.ssh/id_rsa.pub ao heroku
+$ heroku keys:add
+
+- adicionando a url git que o heroku me forneceu
+- o git permite que o meu repositório local esteja no linkado ao github, heroku e mais outros repositórios externos
+- linkando  este repositório com o heroku
+$ git remote add heroku https://git.heroku.com/djangoe-commerce.git
+
+- verificando
+$ git remote -v
+heroku	https://git.heroku.com/djangoe-commerce.git (fetch)
+heroku	https://git.heroku.com/djangoe-commerce.git (push)
+origin	https://github.com/Josue23/djangoecommerce.git (fetch)
+origin	https://github.com/Josue23/djangoecommerce.git (push)
+
+libs que precisam ser instaladas antes de fazer o deploy no heroku
+$ pip install dj-database-url==0.4.1
+$ pip install gunicorn==19.4.5
+$ pip install -U django==1.9.6
+$ pip install psycopg2==2.6.1
+
+
+djangoecommerce/settings.py
+import os
+import dj_database_url
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+- a diferença entre BASE_DIR e o PROJECT_ROOT é que BASE_DIR é relatico ao diretório raiz
+- o PROJECT_ROOT é na pasta settings
+
+
+# gerar um arquivo com as libs que estão instaladas no meu virtualenv
+$ pip freeze > requirements.txt
+
+# crio o arquivo runtime.txt com a versão do python instalado
+$ python --version > runtime.txt
+
+# crio o arquivo Procfile com o conteúdo:
+- assim o vai rodar o runserver, no heroku, como se tivesse em desenvolvimento
+web: python manage.py runserver 0.0.0.0:$PORT
+
+
+$ git commit -am "primeiro deploy no heroku"
+$ git push heroku master
+
+
+====================================================
+====================================================
+====================================================
+====================================================
+SPRINT 2
+aula13-apresentação-da-app-catalog
+Nova app (Catalog)
+essa app vai armazenar as informações de cadastro do produtos e categorias 
+
+vamos criar nesse modulo
+- app Catalog
+- modelagem de produtos
+- modelagem da categoria associada a um produto
+- cadastrar produtos, categorias e fazer pequenas customizações através do django admin
+
+django admin é uma aplicação do django que serve para cadastros em forma de CRUD
+
+====================================================
+====================================================
+aula14-criando-arquivos-de-configurações-locais
+
+# diferenças entre os ambientes local e ambiente em produção:
+	- as configurações do banco de dados são diferentes no ambiente local e no ambiente de produção
+	- DEBUG = False ou DEBUG = True
+	- configurações de arquivos  estáticos
+	- etc....
+# existem várias abordagens  para as configurações funcionem tanto em local quanto em produção 
+	- uma das abordagens é através das variáveis de ambiente
+
+	- vamos usar a abordagem através de um arquivo chamado local_settings.py
+	- este arquivo local_settings.py é um arquivo que vai sobreescrever (no meu ambiente local) algumas configurações de produção
+- crio o arquivo /djangoecommerce/local_settings.py
+- chamo o arquivo /djangoecommerce/local_settings.py no final do arquivo /djangoecommerce/settings.py com a seguinte chamada:
+	try:
+	    from .local_settings import *
+	except ImportError:
+	    pass
+====================================================
+- insiro o arquivo "local_settings.py" no .gitignore para esse arquivo não subir quando eu commitar
+
+- crio o arquivo local_settings.py.example com as mesmas configurações de local_settings.py para subir em produção e ser versionado junto com o sistema
+- assim a minha equipe vai saber exatamente quais são as configurações de local_settings.py
+
+====================================================
+====================================================
+aula15-criando-app-catalog
+
+# antes de criar as apps catalog e criar a modelagem do banco de dados precisamos rodar o migrate:
+
+- o django tem as suas classes modelos que são os models
+- essas classes referenciam uma tabela no banco de dados relacional
+
+- o comando migrate busca todos os modelos que o meu projeto já tem e cria as tabelas associadas a esses modelos
+
+$ ./manage.py migrate
+- busca todos os modelos dentro do meu projeto e vai criar as tabelas associadas a esses modelos
+- o django gera arquivos de migração que são coisas que devem ser inseridas no banco de dados de acordo com a sua modelagem, sua classe
+$ ./manage.py migrate quando rodado pela primeira vez, cria o db.sqlite3 com as tabelas iniciais
+
+pedaço da saída do comendo:
+$ ./manage.py migrate
+Operations to perform:
+  Apply all migrations: admin, sessions, contenttypes, auth
+Running migrations:
+  Rendering model states... DONE
+  Applying contenttypes.0001_initial... OK
+
+Criando a app catalog
+./manage.py startapp catalog
+- abro o arquivo:
+catalog/models.py que é o arquivo dos models associados à app catalog
+- crio os modelos que são as classes que representam as tabelas do nosso banco de dados da app catalog
+
+class Category(models.Model):
+- toda classe que herdar de models.Model vai ser um modelo que representa uma tabela no banco de dados
+
+- exemplo de nome de campo na tabela
+name = models.CharField('nome') representa campo de texto
+
+====================================================
+- Existem vários tipos de campos:
+	- CharField representa campo de texto
+	- IntegerField representa um inteiro
+	- ImageField representa uma imagem
+- O django tem uma série de campos que tem a sua correspondência no banco de dados
+====================================================
+- Com exceção de ForeignKey, todos os campos tem verbose_name
+	- verbose_name é uma forma mais elegante de chamar  o modelo (é mais human friendly), mais legível
+	- CharField é comparado ao VarChar no banco  de dados 
+====================================================
+	- SlugField é quase a mesma coisa que o CharField, é um identificador único
+====================================================
+catalog/models.py
+class Meta:
+- são meta informações acerca desse modelo 
+- o django tem algumas opções na class Meta, são elas:
+	- verbose_name, é uma espécie do verbose_name do campo no banco de dados
+		- ao invés de descrever o campo, eu vou descrever a classe em si
+
+	- verbose_name_plural, faz a mesma coisa que o verbose_name só que no plural
+
+	- ordering, onde eu posso ordenar por ordem alfabética, 
+	
+====================================================
+- depois de eu criar os meus modelos eu adiciono a minha app 'catalog' nas apps instaladas em settings.py
+====================================================
+- os modelos que eu acabei de criar não estão ainda no banco de dados
+====================================================
+- adicionando os modelos no meu banco de dados, criar essas tabelas:
+	- São dois passos:
+====================================================
+Primeiro passo:
+- O comando ./manage.py makemigrations gera um arquivo de migração
+- ele detecta que foi adicionado uma nova app
+- ele verifica quantos modelos tem nessa nova app
+====================================================
+- a app catalog tem dois modelos
+	- Category
+	- Product
+- o comando ./manage.py makemigrations criou o arquivo 0001_initial.py com o conteúdo de migração e algumas operações
+	- name
+	- field
+	- options
+	
+$ ./manage.py makemigrations
+Migrations for 'catalog':
+  0001_initial.py:
+    - Create model Category
+    - Create model Product
+
+criou o arquivo 0001_initial.py
+====================================================
+- Segundo passo:
+agora a migração de verdade
+$ ./manage.py migrate
+Operations to perform:
+  Apply all migrations: admin, catalog, contenttypes, auth, sessions
+Running migrations:
+  Rendering model states... DONE
+  Applying catalog.0001_initial... OK
+====================================================
+====================================================
+aula16-visualizando-tabelas-no-banco-de-dados.mp4
+
+- como o django transforma os models do arquivo "/catalog/models.py" numa tabela no banco de dados
+	- model Category
+	- model Product
+====================================================
+Por padrão, todo modelo no django (toda class que o django vai transformar numa tabela no banco tabela) tem uma chave primária única
+====================================================
+- se eu criar minha própria chave primária eu crio um campo a mais na classe
+	- 'code' = models.IntegerField(primary_Key = True)
+		- se tiver setado primary_Key = True, o django não vai criar a chave automaticamente pra mim e ele vai chamar 'code' como a chave primária
+====================================================
+
+- criei a app catalog
+	- o django cria uma tabela com o nome da app, underline, o nome da classe(tudo minúsculo)
+	 - catalog_category (nome da tabela da class Category)
+	 - catalog_product (nome da tabela da class Product)
+
+
+====================================================
+====================================================
+aula17-acessando-ORM-atraves-do-shell-do-django
+	- Tudo que vamos fazer  via linha de comando nessa aula 17 podemos fazer as mesmas coisas pela interface do django admin
+	- eu posso criar minha própria interface administrativa
+
+
+- como manipular no nosso ORM do django através de classes python
+	- inserir, remover, e atualizar registros no banco de dados 
+
+- é melhor usar o ipython por que é mais prático
+$ pip install  ipython
+$ ./manage.py shell
+	- carrega o shell do python com o ambiente django embutido
+	- com os modelos disponíveis
+====================================================
+# importando Product e Category para manipular
+In [1]: from catalog.models import Product, Category 
+
+- como criar uma categoria:
+	- todo model do django tem uma referencia para objects que é um manager intermediário entre a consulta  do bando e o meu modelo(e a minha class)
+	- com o objects(manager) eu consigo acessar as minhas consultas(QuerySet)
+
+O sistema de ORM do django tem tres principais componentes:
+	- model, que criamos no arquivo models.py
+	- manager, este aqui(objects)
+		-	In [2]: Category.objects
+			Out[2]: <django.db.models.manager.Manager at 0x7f87882b29b0>
+				- é criado de forma dinamica
+	- In [3]: Category.objects.all()
+		- como se fosse o SELECT ALL, vai selecionar todos os objects de Category no meu banco de dados 
+	
+	O tipo de Category.objects.all() é uma QuerySet
+		In [4]: type(Category.objects.all())
+		Out[4]: django.db.models.query.QuerySet
+
+	Category é um model
+		In [5]: Category
+		Out[5]: catalog.models.Category
+
+	.objects é do tipo manager
+		In [5]: Category.objects
+		Out[5]: <django.db.models.manager.Manager at 0x7f87882b29b0>
+
+- O manager(objects) faz a conexão com a QuerySet, QuerySet é o objeto que realmente vai fazer as consultas ao banco de dados, vai acessar o banco de dados 
+- O manager tem um método chamado create 
+- O objects.create() é uma chamada para a QuerySet que vai criar o objeto
+In [7]: Category.objects.create()
+
+criando a categoria Programação
+In [7]: Category.objects.create(name='Programação', slug='programacao')
+Out[7]: <Category: Category object>
+
+In [8]: Category.objects.all()   # já tenho um objeto na saída
+Out[8]: [<Category: Category object>]
+
+pegando a primeira categoria, parecido com o 1º índice de lista em python
+In [11]: cat = Category.objects.all()[0]
+
+In [12]: cat
+Out[12]: <Category: Category object>
+
+- criando meu produto direto pelo ORM do django
+In [13]: Product.objects.create(name='Curso de Django', slug='curso-de-django', category=cat, price=100 )
+Out[13]: <Product: Product object>
+
+- exibindo o produto
+In [14]: Product.objects.all()
+Out[14]: [<Product: Product object>]
+
+
+- query se existe algum produto que contém 'django' no nome
+	- o ORM do django utiliza lookup
+	- existem vários lookups
+	- exemplo de lookup:
+		name__icontains='django
+
+In [16]: Product.objects.filter(name__icontains='django')
+Out[16]: [<Product: Product object>]
+
+pegando apenas o slug curso-de-django
+	- o método get retorna apenas um item
+In [21]: Product.objects.get(slug='curso-de-django')
+Out[21]: <Product: Product object>
+
+====================================================
+====================================================
+aula18-djangoAdmin
+
+arquivo catalog/admin.py
+- insere as linhas
+	from .models import Product, Category
+	admin.site.register(Category)
+	admin.site.register(Product)
+- estou indicando ad django admin que tenho dois novos modelos que eu quero 	permitir o seu cadastro através do admin
+====================================================
+- rodo o servidor
+$ ./manage.py runserver
+
+acessso admin através do browser
+localhost:8000/admin/
+====================================================
+criando usuário no django
+$ ./manage.py createsuperuser
+Username: josue
+Email address: josuerodrigues@gmail.com
+Password: 
+Password (again):
+====================================================
+- o método __str__ melhora a legibilidade do meu modelo (em python3)
+    def __str__(self):
+        return self.name
+
+====================================================
+====================================================
+aula19-customizando-django-admin
+
+dentro de cada aplicãção tem o arquivo apps.py
+
+altero o arquivo catalog/apps.py
+adiciono:
+	class CatalogConfig(AppConfig):
+	    name = 'catalog'
+	    verbose_name = 'Catálogo'
+
+em /catalog/__init__.py
+	- crio o default_app_config = 'catalog.apps.CatalogConfig'
+	- eu passo o caminho daquela class 'catalog.apps.CatalogConfig'
+- faço isso em cada app do meu sistema
+-caso exista:
+	- o django vai usar a configuração da class que está no arquivo /catalog/apps.py 
+	class CatalogConfig(AppConfig):
+		name = 'catalog'
+		verbose_name = 'Catálogo'
+
+====================================================
+- criando uma class para exibir mais informações na view do admin 
+class CategoryAdmin(admin.ModelAdmin):
+
+    list_display = ['name', 'slug', 'created', 'modified']
+    search_fields = ['name', 'slug']
+    list_filter = ['created', 'modified']
+
+class ProductAdmin(admin.ModelAdmin):
+
+    list_display = ['name', 'slug', 'category', 'created', 'modified']
+    list_filter = ['created', 'modified']
+    search_fields = ['name', 'slug', 'category__name']
+    	- category__name permite buscar pelo nome da categoria e vou encontrar os produtos da categoria
+====================================================
+====================================================
+aula20-Listando-as-Categorias-template-context-processors
+
+após esta aula, o conteúdo dos models será exibido no site para os visitantes do site
+====================================================
+para eu exibir as categorias, eu preciso adicionar as categorias no contexto do template
+
+Primeiro passo:
+	core/views.py
+	adiciono:
+	from catalog.models import Category
+
+- crio context na view index
+def index(request):
+	context = {
+	'categories': Category.objects.all()
+	}
+	return render(request, 'index.html', context)
+- render é um atalho
+- render sendo um atalho, precisa de request, template (index.html) e um dicionário que é o context que vai renderizar dentro de index.html
+
+- no core/templates/index.html só tem o miolo do site
+- no core/templates/base.html tem os menus de nav com categorias, onde posso alterar
+
+- quando eu preciso que alguma informação do meu banco, do meu sistema esteja disponível em todos os templates, a melhor coisa a se fazer é:
+	usar o context_processors que está no settings.py, TEMPLATES
+	- context_processors são fuñções que são chamadas toda vez que o template for renderizado
+- essas funções que estão em context_processors recebem como parâmetro a requisição e deve retornar um dicionário que as funções vão adicionar variáveis de ambiente a esses dicionários
+
+- vou criar na minha app catalog o arquivo:
+catalog/context_processors.py
+
+
+
+====================================================
+====================================================
+aula21-listando-os-produtos
+- pegar os produtos que estão no banco de dados e exibir no site
+
+edito o arquivo /catalog/views.py
+
+o sistema de templates do django procura uma pasta chamada templates dentro de cada app no meu projeto
+
+- crio a pasta catalog/templates
+- crio outra pasta catalog/templates/catalog
+
+vamos usar url include, separar as urls por módulo
+- dentro de cada app:
+	- crio urls.py
+	- coloco somente as urls da app
+catalog/urls.py
+
+
+
+
+====================================================
+====================================================
+aula22-listando-os-produtos-de-uma-categoria
+
+- quando clicar no link da categoria, exibir somente os produtos desta categoria
+
+/catalog/views.html
+- crio a view category
+	def category(request):
+		return render(request, 'catalog/category.html')
+
+crio o template:
+/catalog/templates/catalog/category.html
+
+/catalog/views.py
+em /catalog/views.py eu crio a view def category(request, slug):
+
+
+crio o template /catalog/category.html
+
+crio url amigável amigável parametrizada com regex em:
+/catalog/urls.py
+====================================================
+- parâmetros de grupos de regex são passados como argumentos de view
+
+o django pode chamar 'slug' de forma posicional ou nomeada
+
+exemplo:
+- no arquivo /catalog/urls.py
+urlpatterns = [
+	url(r'^$', views.product_list, name='product_list'),
+	url(r'^(?P<slug>[\w_-]+)/$', views.category, name='category'),
+	url(r'^produtos/(?P<slug>[\w_-]+)/$', views.product, name='product'),
+]
+
+====================================================
+arquivo /catalog/models.py
+
+    def get_absolute_url(self):
+        return reverse('catalog:category', kwargs={'slug': self.slug})
+
+- assim o modelo sabe qual é a sua própria url
+====================================================
+/catalog/models.py
+eu chamo essa url do /catalog/models.py
+<li><a href="{{ category.get_absolute_url }}">{{ category}}</a></li>
+====================================================
+eu chamo essa url
+
+([\w_-]+)
+url(r'^([\w_-]+)/$', views.category, name='category'),
+	na prática, o django vai chamar:
+category(request, 'design')
+
+
+url(r'^(?P<slug>[\w_-]+)/$'
+	na prática, o django vai chamar:
+category(request, slug='design')
+
+
+====================================================
+====================================================
+aula23-exibindo-um-produto-específico
+====================================================
+na aula passada:
+- exibimos os produtos de uma categoria
+- criamos o método na categoria que identifica sua própria url
+	- a categoria sabe onde ela está localizada de forma pública
+====================================================
+- agora vou escolher meu padrão de url que vou usar
+	- na app /catalog que tem o prefixo "produtos" tenho dois slugs possíveis
+		- slug para categoria
+		- slug para produtos
+
+
+====================================================
+====================================================
+
+aula24-testando-app-catalogo
+
+model-mommy.readthedocs.io/en/latest
+
+$ pip install model_mommy
+facilita muito pra eu manipular os testes adicionando modelos, conteúdos a mais no meu teste
+
+removo o arquivo:
+catalog/tests.py
+
+crio a pasta:
+catalog/tests/
+
+crio os arquivos:
+catalog/tests/__init__.py
+catalog/tests/test_models.py
+catalog/tests/test_views.py
+
+
+$ ./manage.py test
+
+# roda somente os testes da app catalog
+$ ./manage.py test catalog
+
+====================================================
+====================================================
+
+aula25-deploy-da-app-catalog
+
+é melhor rodar com o gunicorn no heroku
+
+lib para servir arquivos estáticos
+$ pip install whitenoise==3.2
+
+# deployando o segundo sprint
+$ git push heroku master
+
+# rodando o migrate em produção lá no heroku
+	- criando os meus modelos nas tabelas correspondentes a eles 
+	- criando as minhas tabelas na minha app no heroku
+$ heroku run python manage.py migrate
+
+# criando superuser na minha app no heroku
+$ heroku run python manage.py createsuperuser
+
+# acesso
+http://djangoe-commerce.herokuapp.com/admin/
+user: admin
+pass: admin123
+
+
+# dados do projeto no githut
+$ git remote add origin https://github.com/Josue23/djangoecommerce.git
+
+$ git remote -v
+heroku	https://git.heroku.com/djangoe-commerce.git (fetch)
+heroku	https://git.heroku.com/djangoe-commerce.git (push)
+origin	https://github.com/Josue23/djangoecommerce.git (fetch)
+origin	https://github.com/Josue23/djangoecommerce.git (push)
+
+
+
+====================================================
+====================================================
+====================================================
+====================================================
+SPRINT3
+aula26-o-que-vamos-fazer-nesse-modulo
+
+- Vamos fazer ajustes nas seguintes partes da app catalog:
+	- primeiro pelo sistema de formulários do django
+		- o sistema de formulários do django serve para fazer processamento das informações que o usuário submete através de uma requisição via GET quando vem via query string(parâmetros na URL, depois do sinal de interrogação)
+
+	- o próximo ajuste é enviar e-mails depois que processa o formulário de contato
+
+	- vamos também melhorar algumas views que já temos utilizando as class-based views(views baseada em classe ao invés de ser baseada em função)
+		- class-based views é um tema muito importante em django e até programadores django experientes tem dificuldade em entender bem esse tema 
+====================================================
+====================================================
+aula27-form-de-contato-shell
+
+- vamos entender como funiona o django form 
+- o tipo de formulários do django é útil para evitar o DRY(don't repeat yourself)
+	- validações
+		- se o campo é obrigatório ou não.....etc
+	- o django já tras embutido um sistema de validações que faz as validações mais comuns em formulários em geral	
+		exemplo:
+			- campo idade(inteiro): o django tem um campo do tipo IntegerField que valida se o valor é inteiro
+		- quando submetemos um formulário, todo valor que passamos no formulário é uma string
+			- quando passamos uma data, passamos a data no formato de string
+				exemplo: 'dia/mes/ano'
+			- temos que ter uma validação no nosso backend
+				- validar se está no formato correto, se a data é válida
+			- depois da validação precisamos converter em valores para podermos trabalhar esses dados em python
+				- trabalhar com a data em DateTime mesmo(o objeto data em python
+	O sistema de formulários do django faz tudo isso
+====================================================
+- criamos o arquivo /core/forms.py
+- o arquivo /core/forms.py está sendo criado no /core por que form de contato é uma coisa mais geral no sistema
+
+- pra eu criar um formulário em django, eu preciso criar uma class que herde de forms.Form
+	- exemplo: class ContactForm(forms.Form):
+		- a partir desse momento eu já tenho um formulário
+
+		- formulário é nada mais que um conjunto de campos
+====================================================
+		- formulário tem três componentes principais:
+			1 - class ou formulário
+			2 - os campos que são os fields
+			3 - widget que é o cara que vai renderizar o html, por que além de validar os dados, além de converter para objetos python ele também gera um html do formulário em si
+
+	class ContactForm(forms.Form):
+
+	    name = forms.CharField(label='Nome')
+
+	    # EmailField é um CharField normal  mas tem uma Regex que valida o e-mail
+	    email = forms.EmailField(label='E-mail')
+
+	    # Todo field tem um cara que é responsável por renderizar o seu html
+	    message = forms.CharField(label='Mensagem', widget=forms.Textarea)
+- Por padrão CharField é um InputField
+- o widget=forms.Textarea sobrepõe o padrão do CharField, ele diz que o CharField de message é um Textarea
+
+- Acabei de criar o meu primeiro formulário
+====================================================
+- Fazendo testes pelo shell do django no formulário que acabei de criar
+	- $ ./manage.py shell
+	- é como se rodasse o python mesmo só que com o projeto django carregado
+
+	- importando o formulário, a class ContactForm
+	- In [1]: from core.forms import ContactForm
+
+	- criando o meu formulário
+	- In [2]: form = ContactForm()
+
+	- o formulário está criado mas está ainda vazio
+
+	- renderizando o formulário separado por cada campo, tudo dentro de um parágrafo
+	- In [3]: form.as_p()
+	Out[3]: '<p><label for="id_name">Nome:</label> <input id="id_name" name="name" type="text" /></p>\n<p><label for="id_email">E-mail:</label> <input id="id_email" name="email" type="email" /></p>\n<p><label for="id_message">Mensagem:</label> <textarea cols="40" id="id_message" name="message" rows="10">\r\n</textarea></p>'
+====================================================
+	- eu posso controlar melhor esse html gerado	
+	- Posso renderizar também com table e ul
+		- In [4]: form.as_table()
+		- In [5]: form.as_ul()
+====================================================
+	- ele renderiza o label e o input mas não renderizou o valor dos campos por que os campos não tem valor ainda
+	
+	- posso preencher os campos com:
+	- In [7]: data = {'name': 'Josue', 'email': 'contato@'}
+		- preenchi com um email inválido
+
+====================================================
+- agora eu passo o formulário já com os dados que eu quero submeter
+	- In [8]: form = ContactForm(data)
+
+	- agora eu tenho um formulário com dados informados
+
+- o primeiro parâmetro que o formulário recebe é um dicionário com valores
+====================================================
+- Testando se o formulário está válido:
+	- In [9]: form.is_valid()
+	Out[9]: False
+
+	- o formulário está inválido por que:
+		1 - o campo email não é válido
+		2 - o campo message é obrigatório e não  foi preenchido
+- exibindo os erros no formulário
+	In [10]: form.errors
+	Out[10]: 
+	{'email': ['Enter a valid email address.'],
+	 'message': ['This field is required.']}
+	 	- widget=forms.Textarea tem required=True por padrão, por isso a mensagem de erro é 'This field is required.'
+	 	- se eu setar required=False ele não iria exigir o preenchimento do widget=forms.Textarea, do (campo de mensagem)
+
+- ele me retorna um dicionário:
+	- para cada campo que tem erro, ele me retorna uma lista de mensagens
+
+- as mensagens serão exibidas em pt-br quando forem exibidas pelo template(pelo browser)
+====================================================
+- agora vai retornar os valores que eu passei no comando:
+	- data = {'name': 'Josue', 'email': 'contato@'}
+- In [11]: form.as_p()
+- Out[11]: '<p><label for="id_name">Nome:</label> <input id="id_name" name="name" type="text" value="Josue" /></p>\n<ul class="errorlist"><li>Enter a valid email address.</li></ul>\n<p><label for="id_email">E-mail:</label> <input id="id_email" name="email" type="email" value="contato@" /></p>\n<ul class="errorlist"><li>This field is required.</li></ul>\n<p><label for="id_message">Mensagem:</label> <textarea cols="40" id="id_message" name="message" rows="10">\r\n</textarea></p>'
+
+- no campo email, ele retorna uma <ul> com uma lista de erros
+	<ul class="errorlist"><li>This field is required.</li>
+====================================================
+- Todas essas saídas de erros são customizáveis:
+	- a gente consegue controlar como esse erro vai ser renderizado
+	exemplo:
+		- não vamos utilizar esse "errorlist" no bootstrap
+		- vamos exibir os errosde outra forma
+- é sempre bom utilizar o sistema de formulários para validar os dados que vem do usuário
+- o sistema de formulários do django é bastante customizável
+- eu consigo ter controle de cada campo
+====================================================
+- vamos utilizar uma lib que melhora mais ainda a forma como trabalhamos a renderização desse formulário 
+====================================================
+====================================================
+aula28-form-de-contato-no-template
+
+- agora vamos utilizar  nosso formulário de contato na nossa view contact
+- edito a view contact no arquivo /core/views.py
+
+
+====================================================
+instalo o seguinte plugin, dentro do ambiente virtual
+Tweak the form field rendering in templates, not in python-level form definitions
+https://pypi.python.org/pypi/django-widget-tweaks
+.
+$ pip install django-widget-tweaks
+
+- em /settings.py, eu adiciono ‘widget_tweaks’ na parte de INSTALLED_APPS = [
+(nas aplicações instaladas)
+
+- esse plugin cria uma template tag chamada render_field
+- quando eu vou renderizar o campo, eu posso adicionar alterações que eu quero nos atributos desse campo que eu estou renderizando
+- eu condigo definir a mudança desses atributos no próprio template, que é o ideal
+====================================================
+- lembrando: o sistema de template tags do django é customizável
+- eu posso criar minhas próprias template tags
+====================================================
+
+
+====================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
