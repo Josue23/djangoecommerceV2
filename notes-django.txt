@@ -137,20 +137,67 @@ $ mkdir core/templates
 # crio index.html
 $ touch core/templates/index.html
 
+django sempre retorn HttpResponse
+a diferença ´e que existem alguns atalhos que fazem alguma coisa a mais e fazem o encapsulamento dessa coisa a mais que ´e renderizar um template, serializar um objeto etc
+
+# render precisa da requisiçao atual e do template que eu quero passar
+# o django vai buscar index.html em todas as aplicaç~oes e em todos os diretorios adiconais que eu coloquei em 
+'DIRS': [], que fica no djangoecommerce/settings.py
+# se houver mais de um index.html dentro dos meus templates, o django vai pegar o primeiro que ele achar, ordenado pela ordem em INSTALLED_APPS = [
+def index(request):
+	return render(request, 'index.html')
+
+o sistema de templates do django consiste em um contexto e uma linguagem de templates
+a linguagem de templates pode ser qualquer texto com macaç~ao especial, html, markdown, txt
 # marcação especial django templates
-variáveis
-{{ title }} # vai carregar o valor de title, que vem de um context
-- context  é um dicionário com chave e valor, declarado na view
+
+alterando <h1>Django E-Commerce</h1> para marcação <h1>{{ title }}</h1>  
+variáveis no index.html 
+{{ title }} # vai carregar o valor da vari´avel title, que vem de um context
+- context  é um dicionário com chave e valor que vou utilizar dentro do templates declarado na view core/views.py
+a funç~ao render tem o terceiro parametro agora que ´e o context
+def index(request):
+	context = {
+	'title': 'Django E-Commerce'
+	}
+	return render(request, 'index.html', context)
+	#return HttpResponse('Hello World')
 
 - tem também marcação especial de templates tags
 - templates tags vão alterar o fluxo da minha página
 ex: eu tenho uma lista de produtos, faço um for para iterar sobre esta lista de produtos
 
 - filtros, servem para formatar a minha saída
+exemplo:
+<h1>{{ title | capfirst }}</h1> altera a sa´da do context
+context = {
+	'title': 'django e-commerce'
+	}
+para Django e-commerce em http://127.0.0.1:8000/
+
+a funç~ao da view ficou assim:
+def index(request):
+	texts = ['Lorem ipsum dolor sit amet', 'consectetur adipisicing elit']
+	context = {
+	'title': 'django e-commerce',
+	'texts': texts
+	}
+	return render(request, 'index.html', context)
+	#return HttpResponse('Hello World')
+
+o template core/templates/index.html ficou assim:
+<p>
+  	{% for item in texts %}      # começa o for na lista texts
+  	{{ item }}                   # printa cada item da lista texts
+  	{% if not forloop.last %}    # começa um if para filtrar se n~ao ´e o ´ultimo item da lista
+  	,                            # printa a virgula se nao for o ultimo item da lista
+  	{% endif %}                  # termina o filtro com if
+  	{% endfor %}                 # termina o for na lista texts
+</p>
 
 
-====================================================
-====================================================
+======================================fim======================================
+======================================inicio======================================
 AULA 8 - trabalhando com arquivos estáticos
 settings.py
 INSTALLED_APPS = [
