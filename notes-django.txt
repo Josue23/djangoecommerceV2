@@ -114,8 +114,8 @@ def index(request):
 recebe um request que ´e um HttpRequest e retorna um HttpResponse
 
 acabei de fazer meu primeiro hello world na minha primeira aplicaçao que ´e a aplicaçao core
-	criei minha primeira url
-	criei minha primeira view
+	criei minha primeira url - djangoecommerce/djangoecommerce/urls.py
+	criei minha primeira view - djangoecommerce/core/views.py
 - url ´e um padrao regex que vai casar com uma view
 - essa view ´e uma funçao python que recebe um objeto request como parametro e deve retornar um objeto response com o objeto HttpResponse
 
@@ -203,23 +203,39 @@ settings.py
 INSTALLED_APPS = [
 	# como o django serve arquivos estáticos:
 	- o django procura uma pasta chamada static dentro de cada app
-	'django.contrib.staticfiles',
+	'django.contrib.staticfiles', - fica em settings.py - INSTALLED_APPS = [
 ]
+
+por enquanto eu so tenho a app core que ´e uma aplicaçao geral que vai ser reutilizada por todo o sistema
+crio a pasta core/static e coloco todo arquivo estatico geral para o sistema
+exemplo: css principal, JS principalcore/static
+copio a pasta djangoecommerce-aula001/design/assets para core/static/assets
+acesso http://127.0.0.1:8000/static/assets/bootstrap.min.css
+o django ja esta servindo os arquivos estaticos - sem eu precisar fazer nenhuma configuraçao adicional
+
+O django só serve arquivo estático dessa forma se:
+- 'django.contrib.staticfiles', # tiver ativa - se tiver a linha em settings.py - INSTALLED_APPS = [
+- ./manage.py runserver         # rodar o projeto com o runserver
+- DEBUG = True                  # estar em modo debug - em settings.py
+
+o django ainda nao esta exibindo o css adequqdo
+GET / HTTP/1.1
+Host: 127.0.0.1
+telnet www.uol.com.br
 
 settings.py
 # o caminho d arquivo estático
-STATIC_URL = '/static/'
+STATIC_URL = '/static/' - no final do arquivo settings.py
 ====================================================
 # pode-se criar também uma pasta de arquivos estáticos  global para o projeto:
-settings.py
+nesse caso eu adiciono em settings.py
 STATICFILES_DIRS = [  # que é uma lista de diretórios alternativos
 	os.path.join(BASE_DIR, 'staticfiles') # staticfiles é a pasta global na raiz do projeto
-]
+] # BASE_DIR ´e a raiz do projeto
+eu crio a pasta staticfiles na raiz do projeto - djangoecommerce/staticfiles/
+coloco os arquivos est´aticos dentro desta pasta
+***normalmente eu n~ao crio esta pasta djangoecommerce/staticfiles/, assim eu evito mais configuraç~oes pro projeto***
 
-O django só serve arquivo estático se:
-- 'django.contrib.staticfiles', # tiver ativa
-- ./manage.py runserver         # rodar o projeto com o runserver
-- DEBUG = True                  # estar em modo debug
 ====================================================
 - Para carregar os arquivos estáticos automaticamente:
 - insere a linha {% load static %} em:
